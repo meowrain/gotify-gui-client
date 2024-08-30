@@ -1,8 +1,10 @@
 <!-- eslint-disable vue/multi-word-component-names -->
-<script lang="ts">
+<script lang="ts" setup>
 
 </script>
 <template>
-    <div></div>
+    <div>
+
+    </div>
 </template>
 <style lang="scss"></style>
