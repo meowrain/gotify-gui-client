@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <h1>Helloworld</h1>
+  <RouterView />
 </template>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

@@ -12,5 +12,14 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  base: './'
+  base: './',
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://gotify.meowrain.cn',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  }
 })
