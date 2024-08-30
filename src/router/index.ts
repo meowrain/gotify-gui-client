@@ -14,11 +14,10 @@ const router = createRouter({
       component: () => import('@/views/web/config/index.vue')
     },
     {
-      path: '/login',
-      name: 'Login',
-      component: ()=>import('@/views/web/login/login.vue')
+      path: '/about',
+      name: 'About',
+      component: ()=>import('@/views/web/about/index.vue')
     }
   ]
 })
-
 export default router

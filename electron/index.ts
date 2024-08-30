@@ -3,7 +3,8 @@ import * as fs from 'node:fs'
 const sqlite3 = require('sqlite3').verbose()
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
-require('./menu')
+const WebSocket = require('ws');
+
 // 屏蔽安全警告
 // electron Security Warning (Insecure Content-Security-Policy)
 
@@ -27,7 +28,7 @@ const createWindow = () => {
     // Load your file
     win.loadFile('dist/index.html')
   }
-
+  require('./menu')
   win.webContents.openDevTools()
 }
 app.whenReady().then(() => {
@@ -79,3 +80,34 @@ ipcMain.handle('get-data', (event, key) => {
     })
   })
 })
+
+let ws = null;
+
+ipcMain.handle('connect-websocket', async (event, url) => {
+  if (ws) {
+    ws.close();
+  }
+
+  ws = new WebSocket(url);
+
+  ws.on('message', (data) => {
+    event.sender.send('websocket-message', data.toString());
+  });
+
+  ws.on('error', (error) => {
+    console.error('WebSocket error:', error);
+    event.sender.send('websocket-error', error.message);
+  });
+
+  ws.on('close', (code, reason) => {
+    console.log('WebSocket connection closed:', code, reason);
+    event.sender.send('websocket-close', { code, reason });
+  });
+});
+
+ipcMain.handle('disconnect-websocket', async () => {
+  if (ws) {
+    ws.close();
+    ws = null;
+  }
+});

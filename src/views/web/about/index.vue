@@ -1,10 +1,11 @@
 <!-- eslint-disable vue/multi-word-component-names -->
-<script lang="ts" setup>
+<script setup lang="ts">
 
 </script>
 <template>
-    <div>
+  <div>
+    <h1>About</h1>
+  </div>
 
-    </div>
 </template>
 <style lang="scss"></style>

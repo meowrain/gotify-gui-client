@@ -1,8 +1,8 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script lang="ts" setup>
-import { checkServerStatus } from '@/utils/checkHealth'
+import { checkServerStatus } from '@/api/checkHealth'
 import { ShowNotification } from '@/utils/notification'
-import { reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 
 const api = window.api
 console.log(api)
@@ -23,13 +23,14 @@ const form_url = reactive({
 })
 const form_login = reactive({
   username: '',
-  password: ''
+  token: ''
 })
 
 async function setData() {
   try {
     await api.setData('username', form_login.username)
-    await api.setData('password', form_login.password)
+    await api.setData('token', form_login.token)
+    await api.setData('url', form_url.url)
     console.log('Data saved')
   } catch (error) {
     console.error('Error saving data', error)
@@ -45,7 +46,16 @@ async function getData() {
   }
 }
 
-function loadData() {}
+onMounted(async () => {
+  try {
+    form_url.url = await api.getData('url')
+    form_login.username = await api.getData('username')
+    form_login.token = await api.getData('token')
+    console.log('Data fetched')
+  } catch (error) {
+    console.log(error)
+  }
+})
 </script>
 <template>
   <el-header>
@@ -64,8 +74,8 @@ function loadData() {}
       <el-form-item label="username">
         <el-input v-model="form_login.username"></el-input>
       </el-form-item>
-      <el-form-item label="password">
-        <el-input type="password" v-model="form_login.password"></el-input>
+      <el-form-item label="token">
+        <el-input type="password" v-model="form_login.token"></el-input>
       </el-form-item>
       <el-form-item label-width="0">
         <el-button type="primary" @click="setData">提交信息</el-button>
