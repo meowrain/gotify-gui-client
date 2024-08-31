@@ -1,6 +1,6 @@
 /*
-*
-* */
+ *
+ * */
 interface User {
   admin: boolean
   id: number

@@ -33,7 +33,10 @@ async function setData() {
     await api.setData('token', form_login.token)
     await api.setData('url', form_url.url)
     await api.setData('application_token', form_login.application_token)
-    await api.setData('ws_url',`${import.meta.env.VITE_API_WEBSOCKET_URL}/stream?token=${form_login.token}`)
+    await api.setData(
+      'ws_url',
+      `${import.meta.env.VITE_API_WEBSOCKET_URL}/stream?token=${form_login.token}`
+    )
     console.log('Data saved')
   } catch (error) {
     console.error('Error saving data', error)

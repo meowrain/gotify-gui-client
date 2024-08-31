@@ -1,4 +1,4 @@
-import WebSocket from 'ws';
+import WebSocket from 'ws'
 interface ErrorInfo {
   error: string
   errorCode: number
@@ -63,9 +63,9 @@ export async function connectWebSocket(): Promise<void> {
   const api = window.api
   try {
     const url = await api.getData('ws_url')
-    await api.connectWebSocket(url);
+    await api.connectWebSocket(url)
   } catch (error) {
-    console.error('错误:', error);
+    console.error('错误:', error)
   }
 }
 
@@ -73,9 +73,9 @@ export async function connectWebSocket(): Promise<void> {
 // 推送消息函数
 export async function pushMessage(message: string) {
   try {
-    const response = await window.api.pushMessage(message);
+    const response = await window.api.pushMessage(message)
     return response
   } catch (error) {
-    console.error('Failed to send message:', error);
+    console.error('Failed to send message:', error)
   }
 }
