@@ -1,21 +1,23 @@
 const { contextBridge } = require('electron')
 const ipcRender = require('electron').ipcRenderer
-// 监听 WebSocket 消息
-ipcRender.on('websocket-message', (event, message) => {
-  console.log('Received WebSocket message:', message);
-  // 处理 WebSocket 消息，例如更新 Vue 数据
-  // 例如，使用 Vuex 或 Vue 的响应式系统来处理消息
-});
+//
+// // 监听 WebSocket 消息
+// ipcRender.on('websocket-message', (event, message) => {
+//   console.log('Received WebSocket message:', message);
+//   // 处理 WebSocket 消息，例如更新 Vue 数据
+//   // 例如，使用 Vuex 或 Vue 的响应式系统来处理消息
+// });
+//
+// ipcRender.on('websocket-error', (event, error) => {
+//   console.error('WebSocket error:', error);
+//   // 处理 WebSocket 错误
+// });
+//
+// ipcRender.on('websocket-close', (event, { code, reason }) => {
+//   console.log('WebSocket closed:', code, reason);
+//   // 处理 WebSocket 关闭
+// });
 
-ipcRender.on('websocket-error', (event, error) => {
-  console.error('WebSocket error:', error);
-  // 处理 WebSocket 错误
-});
-
-ipcRender.on('websocket-close', (event, { code, reason }) => {
-  console.log('WebSocket closed:', code, reason);
-  // 处理 WebSocket 关闭
-});
 contextBridge.exposeInMainWorld('api', {
   ipcRender: ipcRender,
   getData: (key: string) => ipcRender.invoke('get-data', key),
@@ -36,5 +38,16 @@ contextBridge.exposeInMainWorld('api', {
     ipcRender.on('websocket-close', (event, { code, reason }) => {
       console.log('WebSocket closed:', code, reason);
     });
+  },
+  pushMessage: async (message) =>{
+    const url = await ipcRender.invoke('get-data', 'url');
+    const token = await ipcRender.invoke('get-data', 'application_token');
+    try {
+      const response = await ipcRender.invoke('push-message', { message, url, token });
+      console.log('Message sent successfully:', response);
+      return response
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
   }
 })

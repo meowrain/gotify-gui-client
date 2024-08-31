@@ -23,7 +23,8 @@ const form_url = reactive({
 })
 const form_login = reactive({
   username: '',
-  token: ''
+  token: '',
+  application_token: ''
 })
 
 async function setData() {
@@ -31,6 +32,8 @@ async function setData() {
     await api.setData('username', form_login.username)
     await api.setData('token', form_login.token)
     await api.setData('url', form_url.url)
+    await api.setData('application_token', form_login.application_token)
+    await api.setData('ws_url',`${import.meta.env.VITE_API_WEBSOCKET_URL}/stream?token=${form_login.token}`)
     console.log('Data saved')
   } catch (error) {
     console.error('Error saving data', error)
@@ -51,6 +54,7 @@ onMounted(async () => {
     form_url.url = await api.getData('url')
     form_login.username = await api.getData('username')
     form_login.token = await api.getData('token')
+    form_login.application_token = await api.getData('application_token')
     console.log('Data fetched')
   } catch (error) {
     console.log(error)
@@ -77,9 +81,11 @@ onMounted(async () => {
       <el-form-item label="token">
         <el-input type="password" v-model="form_login.token"></el-input>
       </el-form-item>
+      <el-form-item label="application_token">
+        <el-input type="password" v-model="form_login.application_token"></el-input>
+      </el-form-item>
       <el-form-item label-width="0">
         <el-button type="primary" @click="setData">提交信息</el-button>
-        <el-button type="primary" @click="getData">查看信息</el-button>
       </el-form-item>
     </el-form>
   </el-main>

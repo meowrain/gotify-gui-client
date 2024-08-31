@@ -1,113 +1,33 @@
-import * as fs from 'node:fs'
+const { app, BrowserWindow } = require('electron');
+const path = require('path');
+const { dbInit } = require('./util/database');
+require('./util/ipcHandler'); // 导入 IPC 处理模块
 
-const sqlite3 = require('sqlite3').verbose()
-const { app, BrowserWindow, ipcMain } = require('electron')
-const path = require('path')
-const WebSocket = require('ws');
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
-// 屏蔽安全警告
-// electron Security Warning (Insecure Content-Security-Policy)
-
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
-let db
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      // eslint-disable-next-line no-undef
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       enableRemoteModule: true,
-      nodeIntegration: true
-    }
-  })
+      nodeIntegration: true,
+    },
+  });
+
   if (process.env.VITE_DEV_SERVER_URL) {
-    win.loadURL(process.env.VITE_DEV_SERVER_URL)
+    win.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
-    // Load your file
-    win.loadFile('dist/index.html')
+    win.loadFile('dist/index.html');
   }
-  require('./menu')
-  win.webContents.openDevTools()
-}
+
+  require('./menu');
+  win.webContents.openDevTools();
+};
+
 app.whenReady().then(() => {
-  createWindow()
-  dbInit()
-})
-const dbInit = () => {
-  // Ensure the directory exists
-  const dbPath = path.join(__dirname, 'data', 'data.db')
-  fs.mkdirSync(path.dirname(dbPath), { recursive: true })
-
-  // Open SQLite database
-  db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-      console.error('Error opening database', err)
-    } else {
-      console.log('Database opened successfully')
-    }
-  })
-
-  // Create a table if not exists
-  db.run('CREATE TABLE IF NOT EXISTS kv_store (key TEXT PRIMARY KEY, value TEXT)', (err) => {
-    if (err) {
-      console.error('Error creating table', err)
-    }
-  })
-}
-// 處理IPC通信
-ipcMain.handle('set-data', (event, key, value) => {
-  return new Promise((resolve, reject) => {
-    db.run('INSERT OR REPLACE INTO kv_store (key, value) VALUES (?, ?)', [key, value], (err) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve()
-      }
-    })
-  })
-})
-
-ipcMain.handle('get-data', (event, key) => {
-  return new Promise((resolve, reject) => {
-    db.get('SELECT value FROM kv_store WHERE key = ?', [key], (err, row) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(row ? row.value : null)
-      }
-    })
-  })
-})
-
-let ws = null;
-
-ipcMain.handle('connect-websocket', async (event, url) => {
-  if (ws) {
-    ws.close();
-  }
-
-  ws = new WebSocket(url);
-
-  ws.on('message', (data) => {
-    event.sender.send('websocket-message', data.toString());
-  });
-
-  ws.on('error', (error) => {
-    console.error('WebSocket error:', error);
-    event.sender.send('websocket-error', error.message);
-  });
-
-  ws.on('close', (code, reason) => {
-    console.log('WebSocket connection closed:', code, reason);
-    event.sender.send('websocket-close', { code, reason });
-  });
-});
-
-ipcMain.handle('disconnect-websocket', async () => {
-  if (ws) {
-    ws.close();
-    ws = null;
-  }
+  createWindow();
+  dbInit();
 });

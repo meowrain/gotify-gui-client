@@ -1,0 +1,23 @@
+directories:
+  output: release/
+  buildResources: assets
+appId: app.desktop
+productName: app
+asar: true
+copyright: Copyright © 2022 electron
+files:
+  - filter:
+      - dist-electron/**/*
+      - dist/**/*
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: ${productName}_${version}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+electronVersion: 32.0.1
